@@ -1,33 +1,13 @@
 from django import forms 
-from .models import uploadedVid,forum
+from .models import ipfs,team,capture,buy_energy,meter_analytics,summary_file,meta_video,forum,cloud
+       
 
-class vidForm(forms.ModelForm):
+class buyForm(forms.ModelForm):
     class Meta:
-        model=uploadedVid
+        model = buy_energy
         fields = [
-            'video_name',
-            'video',
-    
-        ]
-        widgets = {
-            'video_name': forms.TextInput(attrs={
-                'class': "form-control",
-                'style': 'max-width: 300px;height: 50px;',
-                'placeholder': 'Video Name'
-                }),
-                # 'uploadfile' : forms.ClearableFileInput(attrs={
-            #     'class': "form-control",
-            #     'style': 'max-width: 300px;height: 50px;',
-            #     'placeholder': 'File'
-            #     })
-
-
-        }
-
-class forumForm(forms.ModelForm):
-    class Meta:
-        model=forum
-        fields=[
-            'user_name',
-            'answer',
+            'cus_name',
+            'meter_id',
+            'quantity',
+            'energy_price',
         ]

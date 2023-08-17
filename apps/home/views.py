@@ -2,16 +2,47 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .LipNet import *
-from .models import uploadedVid
-from .forms import vidForm,forumForm
 from django.conf import settings
+from .models import buy_energy
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+# from .smart_meter_data_with_datetime import smart_meter
+from .forms import buyForm
+from django.views.decorators.csrf import csrf_exempt
+
+
+
+
+
+def buy_view(request):
+    formb=buyForm(request.POST or None)
+    print(formb.is_valid)
+    if formb.is_valid():
+        objb=formb.save(commit=False)
+        objb.save()
+
+        sellers = buy_energy.objects.all()
+        context={
+            'formb':formb, 
+            'sellers':sellers,
+                 }
+
+        html_template = loader.get_template('home/buy_page.html')
+        return HttpResponse(html_template.render(context,request))
+    
+    sellers = buy_energy.objects.all()
+    for i in sellers:
+        print(i.cus_name)
+    context = { 'formb' : formb , 'sellers' : sellers } 
+
+    html_template = loader.get_template('home/buy_page.html')
+    return HttpResponse(html_template.render(context, request))
+
 
 
 @login_required(login_url="/login/")
@@ -19,44 +50,7 @@ def index(request):
     context = {'segment': 'index'}
 
     html_template = loader.get_template('home/index.html')
-    return HttpResponse(html_template.render(context, request))
-
-def disussion(request):
-    d=forumForm(request.POST or None)
-    if d.is_valid():
-        obj = d.save(commit=False)
-        obj.save()
-        name=obj.user_name
-        ans=obj.answer
-
-    context={'name':name,'ans':ans}
-
-    html_template = loader.get_template('home/forum.html')
-    return HttpResponse(html_template.render(context, request))
-
-
-def video_upload(request):
-    a = vidForm(request.POST or None, request.FILES or None)
-    if a.is_valid():
-        obj = a.save(commit=False)
-        obj.save()
-        s=obj.video.url.split('/')[-1]
-        s1=s.split("_")
-        print(s1[0])
-        v_path=obj.video.url
-        v_path=s1[0]
-        print(v_path)
-        n=v_path.split(".")
-        name=n[0]
-        print(name)
-
-        output=lipOut(v_path)
-        # output=lipOut(v)
-        # output='hi'
-    context={'output':output,'v_path':v_path,'name': name}
-
-    html_template = loader.get_template('home/upload.html')
-    return HttpResponse(html_template.render(context, request))
+    return HttpResponse(html_template.render(context, request))   
 
 
 @login_required(login_url="/login/")
